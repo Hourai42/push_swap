@@ -18,13 +18,48 @@
 ** where you need them instead of inside the header file.
 */
 
-#include <libft.h>
-#include "ft_printf.h"
+# include <libft.h>
+# include "ft_printf.h"
+
+# define SA 0
+# define SB 1
+# define SS 2
+# define PA 3
+# define PB 4
+# define RA 5
+# define RB 6
+# define RR 7
+# define RRA 8
+# define RRB 9
+# define RRR 10
+
+/*
+** Not top is one away from the top.
+*/
+
+typedef struct s_stack
+{
+    struct s_stack *top;
+    struct s_stack *not_top;
+    struct s_stack *uppity;
+    int nbr;
+}               t_stack;
+
+/*
+** A regular stack for holding instructions
+*/
+
+typedef struct s_rstack
+{
+    struct s_rstack *top;
+    struct s_rstack *uppity;
+    int instruction;
+}               t_rstack;
 
 /*
 ** Functions for checker
 */
 
-int main(void);
+int main(int argc, char **argv);
 
 #endif

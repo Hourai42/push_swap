@@ -18,13 +18,11 @@
 ** where you need them instead of inside the header file.
 */
 
-#include <libft.h>
-#include "ft_printf.h"
+# include <libft.h>
+# include "ft_printf.h"
 
 /*
 ** Functions for push_swap
 */
-
-int main(void);
 
 #endif
