@@ -10,9 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "push_swap.h"
+#include "checker.h"
 
 int main(void)
 {
+	ft_printf("%s\n", KNIFE KNIFE KNIFE KNIFE KNIFE KNIFE KNIFE KNIFE KNIFE);
 	return (0);
 }

@@ -19,14 +19,12 @@
 */
 
 #include <libft.h>
-
-/*
-** Functions for checker
-*/
+#include "ft_printf.h"
 
 /*
 ** Functions for push_swap
 */
 
+int main(void);
 
 #endif

@@ -15,12 +15,15 @@ NAME2 = push_swap
 SRCS_DIR = ./srcs/
 INCLUDES = ./includes/
 RM = /bin/rm -f
-FILES1 = 
-FILES2 = 
+FILES1 = checker
+FILES2 = push_swap
+COMMON = 
 CFILES1 = $(patsubst %, $(SRCS_DIR)%.c, $(FILES1)) 
 CFILES2 = $(patsubst %, $(SRCS_DIR)%.c, $(FILES2))
-OFILES = $(patsubst %, %.o, $(FILES1))
+COMMONC = $(patsubst %, $(SRCS_DIR)%.c, $(COMMON))
+OFILES1 = $(patsubst %, %.o, $(FILES1))
 OFILES2 = $(patsubst %, %.o, $(FILES2))
+COMMONO = $(patsubst %, %.o, $(COMMON))
 CFLAGS = -Wall -Wextra -Werror
 
 #libft
@@ -31,9 +34,9 @@ LFT_LINK = -L $(LFT) -l ft
 
 #ft_printf 
 PRINTF = ./ft_printf/
-PRINT_INC = -I $(LFT)$(LFT)$(INCLUDES)
+PRINT_INC = -I $(LFT)$(PRINTF)
 
-all: $(LFT_LIB) $(NAME1) $(NAME2)
+all: $(LFT_LIB) $(COMMON) $(NAME1) $(NAME2) 
 
 $(LFT_LIB):
 	@make -C $(LFT)
@@ -44,15 +47,18 @@ $(OFILES1):
 $(OFILES2):
 	@gcc $(CFLAGS) -c -I $(INCLUDES) $(LFT_INC) $(PRINT_INC) $(CFILES2)
 
+$(COMMON):
+	@gcc $(CFLAGS) -c -I $(INCLUDES) $(LFT_INC) $(PRINT_INC) $(COMMON)
+
 $(NAME1): $(OFILES1)
-	@gcc $(CFLAGS) $(OFILES1) $(LFT_LINK) -o $(NAME1)
+	@gcc $(CFLAGS) $(OFILES1) $(COMMON) $(LFT_LINK) -o $(NAME1)
 
 $(NAME2): $(OFILES2)
-	@gcc $(CFLAGS) $(OFILES2) $(LFT_LINK) -o $(NAME2)
+	@gcc $(CFLAGS) $(OFILES2) $(COMMON) $(LFT_LINK) -o $(NAME2)
 
 clean:
 	@make -C $(LFT) clean
-	@$(RM) $(OFILES1) $(OFILES2)
+	@$(RM) $(OFILES1) $(OFILES2) $(COMMONO)
 
 fclean: clean
 	@make -C $(LFT) fclean

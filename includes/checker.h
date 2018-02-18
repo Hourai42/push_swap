@@ -1,19 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   push_swap.c                                        :+:      :+:    :+:   */
+/*   checker.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ttran <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/02/17 18:59:29 by ttran             #+#    #+#             */
-/*   Updated: 2018/02/17 18:59:30 by ttran            ###   ########.fr       */
+/*   Created: 2018/02/17 20:02:51 by ttran             #+#    #+#             */
+/*   Updated: 2018/02/17 20:02:52 by ttran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "push_swap.h"
+#ifndef CHECKER_H
+# define CHECKER_H
 
-int main(void)
-{
-   ft_printf("%s%s", RED, "What the fuck?\n");
-    return (0);
-}
+/*
+** In future projects where speed is important, only include personal libraries
+** where you need them instead of inside the header file.
+*/
+
+#include <libft.h>
+#include "ft_printf.h"
+
+/*
+** Functions for checker
+*/
+
+int main(void);
+
+#endif
