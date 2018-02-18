@@ -122,6 +122,17 @@ void	init_rstack(t_rstack **instruct)
 	(*instruct)->uppity = NULL;
 }
 
+int	read_instructions(t_rstack *instruct)
+{
+	char *buffer;
+
+	//Can't use GNL, just read and stop when '\n'.
+	// Have a fully null terminated buff size of 5, 
+	//b zero it then read until the end. All are size 2 or 3.
+	// Return 1 if wrong instruction or dumb format. 
+	return (0);
+}
+
 int	check_a(t_stack *a, t_stack *b)
 {
 	t_rstack *instruct;
@@ -132,6 +143,10 @@ int	check_a(t_stack *a, t_stack *b)
 		//free instruct all the way thru
 		return (0);
 	}
+	// function to go thru instruct and run them all
+	// Then the fun part of making all 11 instructions! 
+	// Then another function to see if sorted, for OK or KO.
+	//free instruct
 	return (1);
 }
 
