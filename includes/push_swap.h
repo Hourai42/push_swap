@@ -10,4 +10,23 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef PUSH_SWAP_H
+# define PUSH_SWAP_H
 
+/*
+** In future projects where speed is important, only include personal libraries
+** where you need them instead of inside the header file.
+*/
+
+#include <libft.h>
+
+/*
+** Functions for checker
+*/
+
+/*
+** Functions for push_swap
+*/
+
+
+#endif
