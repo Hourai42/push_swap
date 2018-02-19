@@ -103,12 +103,17 @@ int	parse_nbrs(char *nbrs, t_stack **a)
 	{
 		if (ft_strlen(split_nbrs[n]) > 11 ||
 		(nbr = pushswap_atoi(split_nbrs[n])) > 2147483647 ||
-		nbr < -2147483648 || check_dup(*a) == 1)
+		nbr < -2147483648)
 		{
 			//free split_nbrs string with a function
 			return (0);
 		}
 		slideb_stack(a, (int)nbr);
+		if (check_dup(*a) == 1)
+		{
+			//free split_nbrs
+			return (0);
+		}
 		n++;
 	}
 	//free split_nbrs
@@ -118,7 +123,7 @@ int	parse_nbrs(char *nbrs, t_stack **a)
 void	init_rstack(t_rstack **instruct)
 {
 	(*instruct) = malloc(sizeof(t_rstack));
-	(*instruct)->top = NULL;
+	(*instruct)->bottom = NULL;
 	(*instruct)->uppity = NULL;
 }
 
@@ -182,15 +187,31 @@ int	check_instruction(char *buffer, char *extra)
 	return (in);
 }
 
-void	add_instruction(t_rstack *instruct, int instruction)
-{
-	
-}
-
 /*
-** I don't need to utilize a double pointer here since
-** I can just use "top" to continue adding nodes.
+** Well... now you see the folly in having a pointer to "top".
+** Top constantly changes, so you'll have to update it all the
+** way down. Instead of having "bottom" be the pointer.
 */
+
+void	add_instruction(t_rstack **instruct, int instruction)
+{
+	t_rstack *new;
+
+	if ((*instruct)->bottom == NULL)
+	{
+		(*instruct)->bottom = *instruct;
+		(*instruct)->instruction = instruction;
+	}
+	else
+	{
+		new = malloc(sizeof(t_rstack));
+		new->instruction = instruction;
+		new->uppity = NULL;
+		(*instruct)->uppity = new;
+		new->bottom = (*instruct)->bottom;
+		*instruct = new;
+	}
+}
 
 int	read_instructions(t_rstack *instruct)
 {
@@ -205,18 +226,40 @@ int	read_instructions(t_rstack *instruct)
 		read(1, buffer, 3);
 		if (buffer[0] == '\n')
 			break;
+		if (buffer[1] == '\n')
+			return (1);
 		if (buffer[2] != '\n')
 			read(1, extra, 1);
 		if ((instruct_nbr = check_instruction(buffer, extra)) == 11)
 			return (1);
-		add_instruction(instruct, instruct_nbr);
+		add_instruction(&instruct, instruct_nbr);
 	}
 	return (0);
+}
+
+void	run_instructions(t_rstack *instruct, t_stack *a, t_stack *b)
+{
+	while (instruct != NULL)
+	{
+		(instruct->instruction == SA ? op_sa(a, b) : 0;
+		(instruct->instruction == SB ? op_sb(a, b) : 0;
+		(instruct->instruction == SS ? op_ss(a, b) : 0;
+		(instruct->instruction == PA ? op_pa(a, b) : 0;
+		(instruct->instruction == PB ? op_pb(a, b) : 0;
+		(instruct->instruction == RA ? op_ra(a, b) : 0;
+		(instruct->instruction == RB ? op_rb(a, b) : 0;
+		(instruct->instruction == RR ? op_rr(a, b) : 0;
+		(instruct->instruction == RRA ? op_rra(a, b) : 0;
+		(instruct->instruction == RRB ? op_rrb(a, b) : 0;
+		(instruct->instruction == RRR ? op_rrr(a, b) : 0;
+		instruct = instruct->uppity;
+	}
 }
 
 /*
 ** Here, I only send "instruct" because I'm building from the bottom up
 ** and I wish to keep my final pointer at the bottom once I'm done.
+** Nvm, I can just "store" the bottom and push my way up.
 */
 
 int	check_a(t_stack *a, t_stack *b)
@@ -229,9 +272,9 @@ int	check_a(t_stack *a, t_stack *b)
 		//free instruct all the way thru
 		return (0);
 	}
-	// function to go thru instruct and run them all
+	run_instructions(instruct, a, b);
 	// Then the fun part of making all 11 instructions! 
-	// Then another function to see if sorted, for OK or KO.
+	// Then another function to see if sorted, for OK or KO. A sorted and B empty
 	//free instruct
 	return (1);
 }

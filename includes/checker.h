@@ -35,6 +35,8 @@
 
 /*
 ** Not top is one away from the top.
+** Hm. Use is very important in stack implementation.
+** Ie. whether you need a "top" or a "bottom" ptr, or even neither.
 */
 
 typedef struct s_stack
@@ -51,8 +53,8 @@ typedef struct s_stack
 
 typedef struct s_rstack
 {
-    struct s_rstack *top;
     struct s_rstack *uppity;
+    struct s_rstack *bottom;
     int instruction;
 }               t_rstack;
 
