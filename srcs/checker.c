@@ -120,6 +120,8 @@ int	parse_nbrs(char *nbrs, t_stack **a)
 		n++;
 	}
 	//free split_nbrs
+	if (n < 1)
+		return (0);
 	return (1);
 }
 
@@ -248,6 +250,11 @@ void	init_control(t_control **control, t_stack *stack)
 	(*control)->bottom = stack;
 }
 
+/*
+** A stack B that can never be truly empty, eh? 
+** Setting number to empty and b->top to NULL will be the condition.
+*/
+
 void	run_instructions(t_rstack *instruct, t_stack *a, t_stack *b)
 {
 	t_control *a_control;
@@ -255,21 +262,24 @@ void	run_instructions(t_rstack *instruct, t_stack *a, t_stack *b)
 
 	init_control(&a_control, a);
 	init_control(&b_control, b);
+	//Make a function to check stacks
 	while (instruct != NULL)
 	{
-		(instruct->instruction == SA ? op_sa(a_control) : 0;
-		(instruct->instruction == SB ? op_sa(b_control) : 0;
-		(instruct->instruction == SS ? op_ss(a_control, b_control) : 0;
-		(instruct->instruction == PA ? op_pa(a_control, b_control) : 0;
-		(instruct->instruction == PB ? op_pa(b_control, a_control) : 0;
-		(instruct->instruction == RA ? op_ra(a_control) : 0;
-		(instruct->instruction == RB ? op_ra(b_control) : 0;
-		(instruct->instruction == RR ? op_rr(a_control, b_control) : 0;
-		(instruct->instruction == RRA ? op_rra(a_control) : 0;
-		(instruct->instruction == RRB ? op_rra(b_control) : 0;
-		(instruct->instruction == RRR ? op_rrr(a_control, b_control) : 0;
+		instruct->instruction == SA ? op_sa(a_control) : 0;
+		instruct->instruction == SB ? op_sa(b_control) : 0;
+		instruct->instruction == SS ? op_ss(a_control, b_control) : 0;
+		instruct->instruction == PA ? op_pb(b_control, a_control) : 0;
+		instruct->instruction == PB ? op_pb(a_control, b_control) : 0;
+		//instruct->instruction == RA ? op_ra(a_control) : 0;
+		//instruct->instruction == RB ? op_ra(b_control) : 0;
+		//instruct->instruction == RR ? op_rr(a_control, b_control) : 0;
+		//instruct->instruction == RRA ? op_rra(a_control) : 0;
+		//instruct->instruction == RRB ? op_rra(b_control) : 0;
+		//instruct->instruction == RRR ? op_rrr(a_control, b_control) : 0;
 		instruct = instruct->uppity;
 	}
+	//Make a function to check stacks and see if it's working properly
+	//free controls
 }
 
 /*
@@ -316,5 +326,7 @@ int main(int argc, char **argv)
 		}
 	}
 	//Free A and B, from bottom all the way to top
+	//Check if it's not == NULL already before freeing, because B can become
+	//a part of A. 
 	return (0);
 }

@@ -48,6 +48,13 @@ typedef struct s_stack
     int nbr;
 }               t_stack;
 
+typedef struct s_control
+{
+    struct s_stack *top;
+    struct s_stack *not_top;
+    struct s_stack *bottom;
+}               t_control;
+
 /*
 ** A regular stack for holding instructions.
 */
@@ -64,5 +71,8 @@ typedef struct s_rstack
 */
 
 int main(int argc, char **argv);
+void    op_sa(t_control *a_con);
+void    op_ss(t_control *a_con, t_control *b_con);
+void    op_pb(t_control *a_con, t_control *b_con);
 
 #endif

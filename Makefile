@@ -17,7 +17,7 @@ INCLUDES = ./includes/
 RM = /bin/rm -f
 FILES1 = checker
 FILES2 = push_swap
-COMMON = 
+COMMON = common
 CFILES1 = $(patsubst %, $(SRCS_DIR)%.c, $(FILES1)) 
 CFILES2 = $(patsubst %, $(SRCS_DIR)%.c, $(FILES2))
 COMMONC = $(patsubst %, $(SRCS_DIR)%.c, $(COMMON))
@@ -48,13 +48,13 @@ $(OFILES2):
 	@gcc $(CFLAGS) -c -I $(INCLUDES) $(LFT_INC) $(PRINT_INC) $(CFILES2)
 
 $(COMMON):
-	@gcc $(CFLAGS) -c -I $(INCLUDES) $(LFT_INC) $(PRINT_INC) $(COMMON)
+	@gcc $(CFLAGS) -c -I $(INCLUDES) $(LFT_INC) $(PRINT_INC) $(COMMONC)
 
 $(NAME1): $(OFILES1)
-	@gcc $(CFLAGS) $(OFILES1) $(COMMON) $(LFT_LINK) -o $(NAME1)
+	@gcc $(CFLAGS) $(OFILES1) $(COMMONO) $(LFT_LINK) -o $(NAME1)
 
 $(NAME2): $(OFILES2)
-	@gcc $(CFLAGS) $(OFILES2) $(COMMON) $(LFT_LINK) -o $(NAME2)
+	@gcc $(CFLAGS) $(OFILES2) $(COMMONO) $(LFT_LINK) -o $(NAME2)
 
 clean:
 	@make -C $(LFT) clean

@@ -38,6 +38,7 @@ typedef struct s_stack
 /*
 ** A controller main stack
 ** Check if a stack is empty by "a_con->top" since the top constantly updates.
+** Don't ever use any of the control->stack->top or ->not_tops. Inaccurate!  
 */
 
 typedef struct s_control
@@ -55,7 +56,7 @@ typedef struct s_control
 
 void    op_sa(t_control *a_con);
 void    op_ss(t_control *a_con, t_control *b_con);
-void    op_pa(t_control *a_con, t_control *b_con);
+void    op_pb(t_control *a_con, t_control *b_con);
 void    op_ra(t_control *a_con);
 void    op_rr(t_control *a_con, t_control *b_con);
 void    op_rra(t_control *a_con);
