@@ -45,6 +45,7 @@ void	init_stack(t_stack **a)
 	(*a)->top = NULL;
 	(*a)->not_top = NULL;
 	(*a)->uppity = NULL;
+	(*a)->down = NULL;
 }
 
 int	check_dup(t_stack *a)
@@ -83,6 +84,8 @@ void	slideb_stack(t_stack **a, int num)
 		new = malloc(sizeof(t_stack));
 		if ((*a)->not_top == NULL)
 			(*a)->not_top = new;
+		new->down = NULL;
+		(*a)->down = new;
 		new->top = (*a)->top;
 		new->not_top = (*a)->not_top;
 		new->uppity = *a;
@@ -237,21 +240,34 @@ int	read_instructions(t_rstack *instruct)
 	return (0);
 }
 
+void	init_control(t_control **control, t_stack *stack)
+{
+	(*control) = malloc(sizeof(t_control));
+	(*control)->top = stack->top;
+	(*control)->not_top = stack->not_top;
+	(*control)->bottom = stack;
+}
+
 void	run_instructions(t_rstack *instruct, t_stack *a, t_stack *b)
 {
+	t_control *a_control;
+	t_control *b_control;
+
+	init_control(&a_control, a);
+	init_control(&b_control, b);
 	while (instruct != NULL)
 	{
-		(instruct->instruction == SA ? op_sa(a, b) : 0;
-		(instruct->instruction == SB ? op_sb(a, b) : 0;
-		(instruct->instruction == SS ? op_ss(a, b) : 0;
-		(instruct->instruction == PA ? op_pa(a, b) : 0;
-		(instruct->instruction == PB ? op_pb(a, b) : 0;
-		(instruct->instruction == RA ? op_ra(a, b) : 0;
-		(instruct->instruction == RB ? op_rb(a, b) : 0;
-		(instruct->instruction == RR ? op_rr(a, b) : 0;
-		(instruct->instruction == RRA ? op_rra(a, b) : 0;
-		(instruct->instruction == RRB ? op_rrb(a, b) : 0;
-		(instruct->instruction == RRR ? op_rrr(a, b) : 0;
+		(instruct->instruction == SA ? op_sa(a_control) : 0;
+		(instruct->instruction == SB ? op_sa(b_control) : 0;
+		(instruct->instruction == SS ? op_ss(a_control, b_control) : 0;
+		(instruct->instruction == PA ? op_pa(a_control, b_control) : 0;
+		(instruct->instruction == PB ? op_pa(b_control, a_control) : 0;
+		(instruct->instruction == RA ? op_ra(a_control) : 0;
+		(instruct->instruction == RB ? op_ra(b_control) : 0;
+		(instruct->instruction == RR ? op_rr(a_control, b_control) : 0;
+		(instruct->instruction == RRA ? op_rra(a_control) : 0;
+		(instruct->instruction == RRB ? op_rra(b_control) : 0;
+		(instruct->instruction == RRR ? op_rrr(a_control, b_control) : 0;
 		instruct = instruct->uppity;
 	}
 }
