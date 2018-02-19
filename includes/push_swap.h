@@ -25,4 +25,6 @@
 ** Functions for push_swap
 */
 
+int main(void);
+
 #endif

@@ -12,7 +12,7 @@
 
 #include "checker.h"
 
-int		pushswap_atoi(char *str)
+intmax_t		pushswap_atoi(char *str)
 {
 	int neg;
 	intmax_t nbr;
@@ -73,7 +73,7 @@ void	slideb_stack(t_stack **a, int num)
 {
 	t_stack *new;
 
-	if (*a)->top == NULL
+	if ((*a)->top == NULL)
 	{
 		(*a)->top = *a;
 		(*a)->nbr = num;
@@ -101,9 +101,9 @@ int	parse_nbrs(char *nbrs, t_stack **a)
 	split_nbrs = ft_strsplit(nbrs, ' ');
 	while (split_nbrs[n])
 	{
-		if (ft_strlen(split_nbrs[n]) > 11) ||
-		(nbr = pushswap_atoi(split_nbr[n])) > 2147483647 ||
-		nbr < -2147483648 || check_dup(*a) == 1) 
+		if (ft_strlen(split_nbrs[n]) > 11 ||
+		(nbr = pushswap_atoi(split_nbrs[n])) > 2147483647 ||
+		nbr < -2147483648 || check_dup(*a) == 1)
 		{
 			//free split_nbrs string with a function
 			return (0);
@@ -122,16 +122,102 @@ void	init_rstack(t_rstack **instruct)
 	(*instruct)->uppity = NULL;
 }
 
+void	check_s(char c, int *in)
+{
+	if (c == 'a')
+		*in = SA;
+	else if (c == 'b')
+		*in = SB;
+	else if (c == 's')
+		*in = SS;
+}
+
+void	check_p(char c, int *in)
+{
+	if (c == 'a')
+		*in = PA;
+	else if (c == 'b')
+		*in = PB;
+}
+
+void	check_r(char c, int *in)
+{
+	if (c == 'a')
+		*in = RA;
+	else if (c == 'b')
+		*in = RB;
+	else if (c == 'r')
+		*in = RR;
+}
+
+void	check_rr(char c, int *in)
+{
+	if (c == 'a')
+		*in = RRA;
+	else if (c == 'b')
+		*in = RRB;
+	else if (c == 'r')
+		*in = RRR;
+}
+
+int	check_instruction(char *buffer, char *extra)
+{
+	int in;
+
+	in = 11;
+	if (buffer[2] == '\n')
+	{
+		if (buffer[0] == 's')
+			check_s(buffer[1], &in);
+		else if (buffer[0] == 'p')
+			check_p(buffer[1], &in);
+		else if (buffer[0] == 'r')
+			check_r(buffer[1], &in);
+	}
+	else if (extra[0] == '\n')
+	{
+		if (buffer[0] == 'r' && buffer[1] == 'r')
+			check_rr(buffer[2], &in);
+	}
+	return (in);
+}
+
+void	add_instruction(t_rstack *instruct, int instruction)
+{
+	
+}
+
+/*
+** I don't need to utilize a double pointer here since
+** I can just use "top" to continue adding nodes.
+*/
+
 int	read_instructions(t_rstack *instruct)
 {
-	char *buffer;
+	char buffer[3];
+	char extra[1];
+	int instruct_nbr;
 
-	//Can't use GNL, just read and stop when '\n'.
-	// Have a fully null terminated buff size of 5, 
-	//b zero it then read until the end. All are size 2 or 3.
-	// Return 1 if wrong instruction or dumb format. 
+	while (42)
+	{
+		ft_bzero(buffer, 3);
+		extra[0] = 0;
+		read(1, buffer, 3);
+		if (buffer[0] == '\n')
+			break;
+		if (buffer[2] != '\n')
+			read(1, extra, 1);
+		if ((instruct_nbr = check_instruction(buffer, extra)) == 11)
+			return (1);
+		add_instruction(instruct, instruct_nbr);
+	}
 	return (0);
 }
+
+/*
+** Here, I only send "instruct" because I'm building from the bottom up
+** and I wish to keep my final pointer at the bottom once I'm done.
+*/
 
 int	check_a(t_stack *a, t_stack *b)
 {
@@ -149,6 +235,11 @@ int	check_a(t_stack *a, t_stack *b)
 	//free instruct
 	return (1);
 }
+
+/*
+** Notice how I send the address of a, since I'm building the stack from
+** the top down and I wish to have a pointer to the bottom once I'm done.
+*/
 
 int main(int argc, char **argv)
 {

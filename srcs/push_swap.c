@@ -11,3 +11,9 @@
 /* ************************************************************************** */
 
 #include "push_swap.h"
+
+int main(void)
+{
+    ft_printf("%sThis is Push Swap!\n", RED);
+    return(0);
+}
