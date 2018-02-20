@@ -34,19 +34,8 @@
 # define RRR 10
 
 /*
-** Fuck it, you need to revamp and reorganize ALL of push swap. You're a mess rn.
-** Keep the ptr to stack on top, another ptr to bottom held, and a down instruction.
-** You'll need an up instruction for purely the top and bottom swap, I guess? 
-** Let's go through this step by step.
-** You're overthinking this. Just have a stack with a ptr to the very top and a ptr to 
-** bottom inside of the stack. Then a way down. This will only have 1 difficult edgecase,
-** and that's the last-to-bottom case. Just have control w/ a pointer to that, sheesh. 
-*/
-
-/*
-** Not top is one away from the top.
-** Hm. Use is very important in stack implementation.
-** Ie. whether you need a "top" or a "bottom" ptr, or even neither.
+** Well, that was absolutely painful. I hoped you learned your lesson.
+** Implementations are done in a certain way for a reason.
 */
 
 typedef struct s_stack
@@ -62,7 +51,6 @@ typedef struct s_stack
 typedef struct s_control
 {
     struct s_stack *top;
-    struct s_stack *almostbot;
     struct s_stack *bottom;
 }               t_control;
 
@@ -72,8 +60,8 @@ typedef struct s_control
 
 typedef struct s_queue
 {
-    struct s_queue *
-    struct s_queue *
+    struct s_queue *back;
+    struct s_queue *first;
     int instruction;
 }               t_queue;
 
@@ -82,8 +70,12 @@ typedef struct s_queue
 */
 
 int main(int argc, char **argv);
-void    op_sa(t_control *a_con);
+void    op_sa(t_control *con);
 void    op_ss(t_control *a_con, t_control *b_con);
-void    op_pb(t_control *a_con, t_control *b_con);
+void    op_pa(t_control *a_con, t_control *b_con);
+void    op_ra(t_control *con);
+void    op_rr(t_control *a_con, t_control *b_con);
+void    op_rra(t_control *con);
+void    op_rrr(t_control *a_con, t_control *b_con);
 
 #endif

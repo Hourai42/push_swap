@@ -39,26 +39,24 @@ intmax_t		pushswap_atoi(char *str)
 	return (nbr * neg);
 }
 
-void	init_stack(t_stack **a)
-{
-	*a = malloc(sizeof(t_stack));
-	(*a)->uppity = NULL;
-	(*a)->down = NULL;
-}
+/*
+** Stops at the last one without checking.
+*/
 
-int	check_dup(t_stack *a)
+int	check_dup(t_control *a)
 {
 	int nbr;
+	t_stack *ptr;
 
-	if (a->uppity != NULL)
+	if (a->top->down != NULL)
 	{
-		nbr = a->nbr;
-		a = a->uppity;
-		while (a != NULL)
+		nbr = a->bottom->nbr;
+		ptr = a->top;
+		while (ptr->down != NULL)
 		{
-			if (nbr == a->nbr)
+			if (nbr == ptr->nbr)
 				return (1);
-			a = a->uppity;
+			ptr = ptr->down;
 		}
 	}
 	return (0);
@@ -68,30 +66,25 @@ int	check_dup(t_stack *a)
 ** Slide bottom stack!
 */
 
-void	slidebot_stack(t_control **a, int num)
+void	slidebot_stack(t_control *a, int num)
 {
 	t_stack *new;
 
-	if ((*a)->top == NULL)
+	if (a->top == NULL)
 	{
 		new = malloc(sizeof(t_stack));
-		(*a)
-		(*a)->nbr = num;
+		a->top = new;
+		a->bottom = new;
+		new->nbr = num;
+		new->down = NULL; 
 	}
 	else
 	{
 		new = malloc(sizeof(t_stack));
-		if ((*a)->second == NULL)
-			(*a)->second = new;
-		else if ((*a)->third == NULL)
-			(*a)->third = new;
+		a->bottom->down = new;
+		a->bottom = new;
 		new->down = NULL;
-		(*a)->down = new;
-		new->top = (*a)->top;
-		new->not_top = (*a)->not_top;
-		new->uppity = *a;
 		new->nbr = num;
-		*a = new;
 	}
 }
 
@@ -112,7 +105,7 @@ int	parse_nbrs(char *nbrs, t_control *a)
 			//free split_nbrs string with a function
 			return (0);
 		}
-		slidebot_stack(&a, (int)nbr);
+		slidebot_stack(a, (int)nbr);
 		if (check_dup(a) == 1)
 		{
 			//free split_nbrs
@@ -126,11 +119,11 @@ int	parse_nbrs(char *nbrs, t_control *a)
 	return (1);
 }
 
-void	init_rstack(t_rstack **instruct)
+void	init_queue(t_queue **instruct)
 {
-	(*instruct) = malloc(sizeof(t_rstack));
-	(*instruct)->bottom = NULL;
-	(*instruct)->uppity = NULL;
+	(*instruct) = malloc(sizeof(t_queue));
+	(*instruct)->back = NULL;
+	(*instruct)->first = NULL;
 }
 
 void	check_s(char c, int *in)
@@ -199,27 +192,28 @@ int	check_instruction(char *buffer, char *extra)
 ** way down. Instead of having "bottom" be the pointer.
 */
 
-void	add_instruction(t_rstack **instruct, int instruction)
+void	add_instruction(t_queue **instruct, int instruction)
 {
-	t_rstack *new;
+	t_queue *new;
 
-	if ((*instruct)->bottom == NULL)
+	if ((*instruct)->first == NULL)
 	{
-		(*instruct)->bottom = *instruct;
+		(*instruct)->first = *instruct;
+		(*instruct)->back = NULL;
 		(*instruct)->instruction = instruction;
 	}
 	else
 	{
-		new = malloc(sizeof(t_rstack));
+		new = malloc(sizeof(t_queue));
+		new->back = NULL;
 		new->instruction = instruction;
-		new->uppity = NULL;
-		(*instruct)->uppity = new;
-		new->bottom = (*instruct)->bottom;
+		new->first = (*instruct)->first;
+		(*instruct)->back = new;
 		*instruct = new;
 	}
 }
 
-int	read_instructions(t_rstack *instruct)
+int	read_instructions(t_queue *instruct)
 {
 	char buffer[3];
 	char extra[1];
@@ -243,34 +237,63 @@ int	read_instructions(t_rstack *instruct)
 	return (0);
 }
 
+int		check_sorted(t_control *a, t_control *b)
+{
+	t_stack *ptr;
+
+	ptr = a->top;
+	if (b->bottom != NULL)
+		return (0);
+	while (ptr->down != NULL)
+	{
+		if (ptr->nbr > ptr->down->nbr)
+			return (0);
+		ptr = ptr->down;
+	}
+	return (1);
+}
+
+void	check_stack(t_control *a)
+{
+	t_stack *ptr;
+
+	ptr = a->top;
+	ft_putstr("stack:");
+	while (ptr != NULL)
+	{
+		ft_putnbr(ptr->nbr);
+		write(1, " ", 1);
+		ptr = ptr->down;
+	}
+	write(1, "\n", 1);
+}
+
 /*
 ** A stack B that can never be truly empty, eh? 
 ** Setting number to empty and b->top to NULL will be the condition.
 */
 
-void	run_instructions(t_rstack *instruct, t_stack *a, t_stack *b)
+void	run_instructions(t_queue *instruct, t_control *a, t_control *b)
 {
-	t_control *a_control;
-	t_control *b_control;
-
-	//Make a function to check stacks
-	while (instruct != NULL)
+	check_stack(a);
+	check_stack(b);
+	while (instruct != NULL && instruct->first != NULL)
 	{
-		instruct->instruction == SA ? op_sa(a_control) : 0;
-		instruct->instruction == SB ? op_sa(b_control) : 0;
-		instruct->instruction == SS ? op_ss(a_control, b_control) : 0;
-		instruct->instruction == PA ? op_pb(b_control, a_control) : 0;
-		instruct->instruction == PB ? op_pb(a_control, b_control) : 0;
-		//instruct->instruction == RA ? op_ra(a_control) : 0;
-		//instruct->instruction == RB ? op_ra(b_control) : 0;
-		//instruct->instruction == RR ? op_rr(a_control, b_control) : 0;
-		//instruct->instruction == RRA ? op_rra(a_control) : 0;
-		//instruct->instruction == RRB ? op_rra(b_control) : 0;
-		//instruct->instruction == RRR ? op_rrr(a_control, b_control) : 0;
-		instruct = instruct->uppity;
+		instruct->instruction == SA ? op_sa(a) : 0;
+		instruct->instruction == SB ? op_sa(b) : 0;
+		instruct->instruction == SS ? op_ss(a, b) : 0;
+		instruct->instruction == PA ? op_pa(a, b) : 0;
+		instruct->instruction == PB ? op_pa(b, a) : 0;
+		instruct->instruction == RA ? op_ra(a) : 0;
+		instruct->instruction == RB ? op_ra(b) : 0;
+		instruct->instruction == RR ? op_rr(a, b) : 0;
+		instruct->instruction == RRA ? op_rra(a) : 0;
+		instruct->instruction == RRB ? op_rra(b) : 0;
+		instruct->instruction == RRR ? op_rrr(a, b) : 0;
+		instruct = instruct->back;
 	}
-	//Make a function to check stacks and see if it's working properly
-	//free controls
+	check_stack(a);
+	check_stack(b);
 }
 
 /*
@@ -279,29 +302,29 @@ void	run_instructions(t_rstack *instruct, t_stack *a, t_stack *b)
 ** Nvm, I can just "store" the bottom and push my way up.
 */
 
-int	check_a(t_stack *a, t_stack *b)
+int	check_a(t_control *a, t_control *b)
 {
-	t_rstack *instruct;
+	t_queue *instruct;
 
-	init_rstack(&instruct);
+	init_queue(&instruct);
 	if (read_instructions(instruct) == 1)
 	{
 		//free instruct all the way thru
 		return (0);
 	}
 	run_instructions(instruct, a, b);
-	// Then the fun part of making all 11 instructions! 
-	// Then another function to see if sorted, for OK or KO. A sorted and B empty
+	if (check_sorted(a, b) == 1)
+		ft_printf("%s%s", GREEN, "OK\n");
+	else
+		ft_printf("%s%s", PURPLE, "KO\n");
 	//free instruct
 	return (1);
 }
 
-void	init_control(t_control **control, t_stack *stack)
+void	init_control(t_control **control)
 {
 	(*control) = malloc(sizeof(t_control));
 	(*control)->top = NULL;
-	(*control)->second = NULL;
-	(*control)->third = NULL;
 	(*control)->bottom = NULL;
 }
 
@@ -326,7 +349,5 @@ int main(int argc, char **argv)
 		}
 	}
 	//Free A and B, from bottom all the way to top
-	//Check if it's not == NULL already before freeing, because B can become
-	//a part of A. 
 	return (0);
 }

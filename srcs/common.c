@@ -16,15 +16,15 @@
 ** Use before changing. Well, or you could just swap the values inside.
 */
 
-void    op_sa(t_control *a_con)
+void    op_sa(t_control *con)
 {
     int tmp;
 
-    if (a_con->top != NULL && a_con->not_top != NULL)
+    if (con->top != NULL && con->top->down != NULL)
     {
-        tmp = a_con->top->nbr;
-        a_con->top->nbr = a_con->not_top->nbr;
-        a_con->not_top->nbr = tmp; 
+        tmp = con->top->nbr;
+        con->top->nbr = con->top->down->nbr;
+        con->top->down->nbr = tmp;
     }
 }
 
@@ -34,44 +34,64 @@ void    op_ss(t_control *a_con, t_control *b_con)
     op_sa(b_con);
 }
 
-/*
-** Couldn't A/B get mixed up like this?
-** Eeeh..... shit. Who cares? They're all arbitrary sections 
-** of memory somewhere in the PC anyway.
-*/
-
-void    op_pb(t_control *a_con, t_control *b_con)
+void    op_pa(t_control *a_con, t_control *b_con)
 {
-    if (a_con->top != NULL)
+    t_stack *ptr;
+
+    if (b_con->bottom != NULL)
     {
-        if (b_con->top == NULL && b_con->bottom != NULL)
-        {
-            b_con->top = b_con->bottom;
-            b_con->bottom->nbr = a_con->top->nbr;
-            free(a_con->top);
-            a_con->top = a_con->not_top;
-            if (a_con->not_top != NULL)
-            {
-                a_con->top->uppity = NULL;
-                a_con->not_top = a_con->not_top->down;
-            }
-            if (a_con->top == NULL)
-                a_con->bottom = NULL;
-        }
-        else
-        {
-            b_con->top = a_con->top;
-            b_con->top->uppity = NULL;
-            b_con->top->down = b_con->not_top;
-            a_con->top = a_con->not_top;
-            if (a_con->not_top != NULL)
-            {
-                a_con->not_top = a_con->not_top->down;
-                a_con->top->uppity = NULL;
-            }
-            if (a_con->top == NULL)
-                a_con->bottom = NULL;
-            
-        }
+        ptr = b_con->top->down;
+        b_con->top->down = a_con->top;
+        if (a_con->bottom == NULL)
+            a_con->bottom = b_con->top;
+        a_con->top = b_con->top;
+        if (ptr == NULL)
+            b_con->bottom = NULL;
+        b_con->top = ptr;
     }
+}
+
+void    op_ra(t_control *con)
+{
+    if (con->top != NULL && con->top->down != NULL)
+    {
+        con->bottom->down = con->top;
+        con->bottom = con->top;
+        con->top = con->top->down;
+        con->bottom->down = NULL;
+    }
+}
+
+void    op_rr(t_control *a_con, t_control *b_con)
+{
+    op_ra(a_con);
+    op_ra(b_con);
+}
+
+void    op_rra(t_control *con)
+{
+    t_stack *ptr;
+    int num;
+
+    if (con->top != NULL && con->top->down != NULL)
+    {
+        ptr = con->top;
+        num = con->bottom->nbr;
+        con->bottom->down = con->top;
+        con->top = con->bottom;
+        while (42)
+        {
+            if (ptr->down->nbr == num)
+                break;
+            ptr = ptr->down;
+        }
+        con->bottom = ptr;
+        con->bottom->down = NULL;
+    }
+}
+
+void    op_rrr(t_control *a_con, t_control *b_con)
+{
+    op_rra(a_con);
+    op_rra(b_con);
 }
