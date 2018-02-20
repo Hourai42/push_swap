@@ -28,8 +28,6 @@
 
 typedef struct s_stack
 {
-    struct s_stack *top;
-    struct s_stack *not_top;
     struct s_stack *uppity;
     struct s_stack *down;
     int nbr;

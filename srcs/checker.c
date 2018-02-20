@@ -42,8 +42,6 @@ intmax_t		pushswap_atoi(char *str)
 void	init_stack(t_stack **a)
 {
 	*a = malloc(sizeof(t_stack));
-	(*a)->top = NULL;
-	(*a)->not_top = NULL;
 	(*a)->uppity = NULL;
 	(*a)->down = NULL;
 }
@@ -70,20 +68,23 @@ int	check_dup(t_stack *a)
 ** Slide bottom stack!
 */
 
-void	slideb_stack(t_stack **a, int num)
+void	slidebot_stack(t_control **a, int num)
 {
 	t_stack *new;
 
 	if ((*a)->top == NULL)
 	{
-		(*a)->top = *a;
+		new = malloc(sizeof(t_stack));
+		(*a)
 		(*a)->nbr = num;
 	}
 	else
 	{
 		new = malloc(sizeof(t_stack));
-		if ((*a)->not_top == NULL)
-			(*a)->not_top = new;
+		if ((*a)->second == NULL)
+			(*a)->second = new;
+		else if ((*a)->third == NULL)
+			(*a)->third = new;
 		new->down = NULL;
 		(*a)->down = new;
 		new->top = (*a)->top;
@@ -94,7 +95,7 @@ void	slideb_stack(t_stack **a, int num)
 	}
 }
 
-int	parse_nbrs(char *nbrs, t_stack **a)
+int	parse_nbrs(char *nbrs, t_control *a)
 {
 	char **split_nbrs;
 	intmax_t nbr;
@@ -111,8 +112,8 @@ int	parse_nbrs(char *nbrs, t_stack **a)
 			//free split_nbrs string with a function
 			return (0);
 		}
-		slideb_stack(a, (int)nbr);
-		if (check_dup(*a) == 1)
+		slidebot_stack(&a, (int)nbr);
+		if (check_dup(a) == 1)
 		{
 			//free split_nbrs
 			return (0);
@@ -242,14 +243,6 @@ int	read_instructions(t_rstack *instruct)
 	return (0);
 }
 
-void	init_control(t_control **control, t_stack *stack)
-{
-	(*control) = malloc(sizeof(t_control));
-	(*control)->top = stack->top;
-	(*control)->not_top = stack->not_top;
-	(*control)->bottom = stack;
-}
-
 /*
 ** A stack B that can never be truly empty, eh? 
 ** Setting number to empty and b->top to NULL will be the condition.
@@ -260,8 +253,6 @@ void	run_instructions(t_rstack *instruct, t_stack *a, t_stack *b)
 	t_control *a_control;
 	t_control *b_control;
 
-	init_control(&a_control, a);
-	init_control(&b_control, b);
 	//Make a function to check stacks
 	while (instruct != NULL)
 	{
@@ -305,6 +296,15 @@ int	check_a(t_stack *a, t_stack *b)
 	return (1);
 }
 
+void	init_control(t_control **control, t_stack *stack)
+{
+	(*control) = malloc(sizeof(t_control));
+	(*control)->top = NULL;
+	(*control)->second = NULL;
+	(*control)->third = NULL;
+	(*control)->bottom = NULL;
+}
+
 /*
 ** Notice how I send the address of a, since I'm building the stack from
 ** the top down and I wish to have a pointer to the bottom once I'm done.
@@ -312,14 +312,14 @@ int	check_a(t_stack *a, t_stack *b)
 
 int main(int argc, char **argv)
 {
-	t_stack *a;
-	t_stack *b;
+	t_control *a;
+	t_control *b;
 
-	init_stack(&a);
-	init_stack(&b);
+	init_control(&a);
+	init_control(&b);
 	if (argc == 2)
 	{
-		if (parse_nbrs(argv[1], &a) == 0 || check_a(a, b) == 0)			
+		if (parse_nbrs(argv[1], a) == 0 || check_a(a, b) == 0)			
 		{
 			ft_putstr(RED);
 			write(2, "Error\n", 6);
