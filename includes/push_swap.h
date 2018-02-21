@@ -21,10 +21,36 @@
 # include <libft.h>
 # include "ft_printf.h"
 
+typedef struct s_stack
+{
+    struct s_stack *down;
+    int nbr;
+}               t_stack;
+
+typedef struct s_control
+{
+    struct s_stack *top;
+    struct s_stack *bottom;
+}               t_control;
+
 /*
 ** Functions for push_swap
 */
 
-int main(void);
+int main(int argc, char **argv);
+void	init_control(t_control **control);
+int	parse_nbrs(char *nbrs, t_control *a);
+intmax_t		pushswap_atoi(char *str);
+void	slidebot_stack(t_control *a, int num);
+int	check_dup(t_control *a);
+int		check_sorted(t_control *a, t_control *b);
+void	check_stack(t_control *a);
+void    op_sa(t_control *con);
+void    op_ss(t_control *a_con, t_control *b_con);
+void    op_pa(t_control *a_con, t_control *b_con);
+void    op_ra(t_control *con);
+void    op_rr(t_control *a_con, t_control *b_con);
+void    op_rra(t_control *con);
+void    op_rrr(t_control *a_con, t_control *b_con);
 
 #endif

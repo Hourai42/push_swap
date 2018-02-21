@@ -5,15 +5,11 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ttran <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/02/17 18:59:29 by ttran             #+#    #+#             */
-/*   Updated: 2018/02/17 18:59:30 by ttran            ###   ########.fr       */
+/*   Created: 2018/02/21 05:32:33 by ttran             #+#    #+#             */
+/*   Updated: 2018/02/21 05:32:58 by ttran            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-int main(void)
-{
-    ft_printf("%sThis is Push Swap!\n", RED);
-    return(0);
-}
+

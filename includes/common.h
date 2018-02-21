@@ -50,6 +50,13 @@ typedef struct s_control
 ** Remember that it's all relative and based on links.. and ptrs.
 */
 
+void	init_control(t_control **control);
+int	parse_nbrs(char *nbrs, t_control *a);
+intmax_t		pushswap_atoi(char *str);
+void	slidebot_stack(t_control *a, int num);
+int	check_dup(t_control *a);
+int		check_sorted(t_control *a, t_control *b);
+void	check_stack(t_control *a);
 void    op_sa(t_control *con);
 void    op_ss(t_control *a_con, t_control *b_con);
 void    op_pa(t_control *a_con, t_control *b_con);

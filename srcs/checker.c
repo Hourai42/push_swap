@@ -12,113 +12,6 @@
 
 #include "checker.h"
 
-intmax_t		pushswap_atoi(char *str)
-{
-	int neg;
-	intmax_t nbr;
-
-	neg = 1;
-	nbr = 0;
-	if (!((*str >= '0' && *str <= '9') || *str == '-'))
-		return (4242424242424242);
-	if (*str == '-')
-	{
-		neg *= -1;
-		str++;
-	}
-	while (*str == '0')
-		str++;
-	while (*str)
-	{
-		if (*str >= '0' && *str <= '9')
-			nbr = nbr * 10 + (*str - '0');
-		else
-			return (4242424242424242);
-		str++;
-	}
-	return (nbr * neg);
-}
-
-/*
-** Stops at the last one without checking.
-*/
-
-int	check_dup(t_control *a)
-{
-	int nbr;
-	t_stack *ptr;
-
-	if (a->top->down != NULL)
-	{
-		nbr = a->bottom->nbr;
-		ptr = a->top;
-		while (ptr->down != NULL)
-		{
-			if (nbr == ptr->nbr)
-				return (1);
-			ptr = ptr->down;
-		}
-	}
-	return (0);
-}
-
-/*
-** Slide bottom stack!
-*/
-
-void	slidebot_stack(t_control *a, int num)
-{
-	t_stack *new;
-
-	if (a->top == NULL)
-	{
-		new = malloc(sizeof(t_stack));
-		a->top = new;
-		a->bottom = new;
-		new->nbr = num;
-		new->down = NULL; 
-	}
-	else
-	{
-		new = malloc(sizeof(t_stack));
-		a->bottom->down = new;
-		a->bottom = new;
-		new->down = NULL;
-		new->nbr = num;
-	}
-}
-
-int	parse_nbrs(char *nbrs, t_control *a)
-{
-	char **split_nbrs;
-	intmax_t nbr;
-	int n;
-
-	n = 0;
-	split_nbrs = ft_strsplit(nbrs, ' ');
-	while (split_nbrs[n])
-	{
-		if (ft_strlen(split_nbrs[n]) > 11 ||
-		(nbr = pushswap_atoi(split_nbrs[n])) > 2147483647 ||
-		nbr < -2147483648)
-		{
-			//free split_nbrs string with a function
-			return (0);
-		}
-		slidebot_stack(a, (int)nbr);
-		if (check_dup(a) == 1)
-		{
-			//free split_nbrs
-			return (0);
-		}
-		n++;
-	}
-	//free split_nbrs
-	if (n < 1)
-		return (0);
-	return (1);
-}
-
 void	init_queue(t_queue **instruct)
 {
 	(*instruct) = malloc(sizeof(t_queue));
@@ -237,37 +130,6 @@ int	read_instructions(t_queue *instruct)
 	return (0);
 }
 
-int		check_sorted(t_control *a, t_control *b)
-{
-	t_stack *ptr;
-
-	ptr = a->top;
-	if (b->bottom != NULL)
-		return (0);
-	while (ptr->down != NULL)
-	{
-		if (ptr->nbr > ptr->down->nbr)
-			return (0);
-		ptr = ptr->down;
-	}
-	return (1);
-}
-
-void	check_stack(t_control *a)
-{
-	t_stack *ptr;
-
-	ptr = a->top;
-	ft_putstr("stack:");
-	while (ptr != NULL)
-	{
-		ft_putnbr(ptr->nbr);
-		write(1, " ", 1);
-		ptr = ptr->down;
-	}
-	write(1, "\n", 1);
-}
-
 /*
 ** A stack B that can never be truly empty, eh? 
 ** Setting number to empty and b->top to NULL will be the condition.
@@ -319,13 +181,6 @@ int	check_a(t_control *a, t_control *b)
 		ft_printf("%s%s", PURPLE, "KO\n");
 	//free instruct
 	return (1);
-}
-
-void	init_control(t_control **control)
-{
-	(*control) = malloc(sizeof(t_control));
-	(*control)->top = NULL;
-	(*control)->bottom = NULL;
 }
 
 /*
