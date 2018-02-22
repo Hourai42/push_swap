@@ -12,10 +12,6 @@
 
 #include "common.h"
 
-/*
-** Use before changing. Well, or you could just swap the values inside.
-*/
-
 void    op_sa(t_control *con)
 {
 	int tmp;
@@ -28,10 +24,35 @@ void    op_sa(t_control *con)
 	}
 }
 
+/*
+** A version that swaps the positions as well.
+*/
+
+void    op_tsa(t_control *con)
+{
+	int tmp;
+
+	if (con->top != NULL && con->top->down != NULL)
+	{
+		tmp = con->top->nbr;
+		con->top->nbr = con->top->down->nbr;
+		con->top->down->nbr = tmp;
+		tmp = con->top->pos;
+		con->top->pos = con->top->down->pos;
+		con->top->down->pos = tmp;
+	}
+}
+
 void    op_ss(t_control *a_con, t_control *b_con)
 {
 	op_sa(a_con);
 	op_sa(b_con);
+}
+
+void	op_tss(t_control *a_con, t_control *b_con)
+{
+	op_tsa(a_con);
+	op_tsa(b_con);
 }
 
 void    op_pa(t_control *a_con, t_control *b_con)
@@ -235,6 +256,15 @@ void	check_stack(t_control *a)
 	while (ptr != NULL)
 	{
 		ft_putnbr(ptr->nbr);
+		write(1, " ", 1);
+		ptr = ptr->down;
+	}
+	ptr = a->top;
+	write(1, "\n", 1);
+	ft_putstr("pos:");
+	while (ptr != NULL)
+	{
+		ft_putnbr(ptr->pos);
 		write(1, " ", 1);
 		ptr = ptr->down;
 	}
