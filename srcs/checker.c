@@ -137,8 +137,6 @@ int	read_instructions(t_queue *instruct)
 
 void	run_instructions(t_queue *instruct, t_control *a, t_control *b)
 {
-	check_stack(a);
-	check_stack(b);
 	while (instruct != NULL && instruct->first != NULL)
 	{
 		instruct->instruction == SA ? op_sa(a) : 0;
@@ -154,8 +152,6 @@ void	run_instructions(t_queue *instruct, t_control *a, t_control *b)
 		instruct->instruction == RRR ? op_rrr(a, b) : 0;
 		instruct = instruct->back;
 	}
-	check_stack(a);
-	check_stack(b);
 }
 
 /*
