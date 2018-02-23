@@ -163,49 +163,178 @@ void	decide_top(int numtop, t_control *b)
 	while (numtop > 0)
 	{
 		op_ra(b);
-		//ft_printf("%s%s", CYAN, "rb\n");
+		ft_printf("%s%s", CYAN, "rb\n");
 		numtop--;
 	}
 }
 
-void	clean_top(t_control *b)
+int		clean_swap_heuristic(t_control *a, int median)
 {
+	int norm_median_top;
+	int norm_median;
+
+	if (a->top != NULL && a->top->down != NULL)
+	{
+		norm_median_top = a->top->pos - median;
+		if (norm_median_top < 0)
+			norm_median_top *= -1;
+		norm_median = a->top->down->pos - median;
+		if (norm_median < 0)
+			norm_median *= -1;
+		if (norm_median_top > norm_median)
+			return (1);
+	}
+	return (0);
+}
+
+void	clean_top_rr(t_control *a, int iterations, int closest_to_middle)
+{
+	int put_back;
+
+	put_back = iterations - closest_to_middle;
+	while (put_back > 0)
+	{
+		op_ra(a);
+		put_back--;
+		ft_printf("%s%s", LIME, "rrb\n");
+	}
+	while (closest_to_middle > 0)
+	{
+		ft_printf("%s%s", PURPLE, "rrr\n");
+		closest_to_middle--;
+	}
+}
+
+void	clean_top_rr_heuristic(t_control *a, int median, int iterations)
+{
+	int tmpiter;
+	int closest_to_middle;
+	int norm_median;
+	int norm_compare;
+
+	closest_to_middle = 0;
+	norm_median = a->top->pos - median;
+	if (norm_median < 0)
+		norm_median *= -1;
+	tmpiter = 0;
+	while (tmpiter < iterations)
+	{
+		op_rra(a);
+		tmpiter++;
+		norm_compare = a->top->pos - median;
+		if (norm_compare < 0)
+			norm_compare *= -1;
+		if (norm_compare < norm_median)
+		{
+			closest_to_middle = tmpiter;
+			norm_median = norm_compare;			
+		}
+	}
+	clean_top_rr(a, iterations, closest_to_middle);
+}
+
+void	clean_top(t_control *a, t_control *b, int median)
+{
+	int i;
+
+	i = 0;
 	if (b->top->nbr < b->top->down->nbr)
 	{
-		op_tsa(b);
-		//ft_printf("%s%s", WHITE, "sb\n");
+		if (clean_swap_heuristic(a, median) == 1)
+		{
+			op_tss(a, b);
+			ft_printf("%s%s", BLUE, "ss\n");
+		}
+		else
+		{
+			op_tsa(b);
+			ft_printf("%s%s", WHITE, "sb\n");
+		}
 	}
 	while (b->top->nbr < b->bottom->nbr)
 	{
+		i++;
 		op_rra(b);
-		//ft_printf("%s%s", LIME, "rrb\n");
+	}
+	if (a->top != NULL)
+		clean_top_rr_heuristic(a, median, i);
+}
+
+void	clean_bot_r(t_control *a, int iterations, int closest_to_middle)
+{
+	int put_back;
+
+	put_back = iterations - closest_to_middle;
+	while (put_back > 0)
+	{
+		op_rra(a);
+		put_back--;
+		ft_printf("%s%s", CYAN, "rb\n");
+	}
+	while (closest_to_middle > 0)
+	{
+		ft_printf("%s%s", DARKYELLOW, "rr\n");
+		closest_to_middle--;
 	}
 }
 
-void	clean_bot(t_control *b)
+void	clean_bot_r_heuristic(t_control *a, int median, int iterations)
 {
+	int tmpiter;
+	int closest_to_middle;
+	int norm_median;
+	int norm_compare;
+
+	closest_to_middle = 0;
+	norm_median = a->top->pos - median;
+	if (norm_median < 0)
+		norm_median *= -1;
+	tmpiter = 0;
+	while (tmpiter < iterations)
+	{
+		op_ra(a);
+		tmpiter++;
+		norm_compare = a->top->pos - median;
+		if (norm_compare < 0)
+			norm_compare *= -1;
+		if (norm_compare < norm_median)
+		{
+			closest_to_middle = tmpiter;
+			norm_median = norm_compare;			
+		}
+	}
+	clean_bot_r(a, iterations, closest_to_middle);
+}
+
+void	clean_bot(t_control *a, t_control *b, int median)
+{
+	int i;
+
+	i = 0;
 	while (b->top->nbr < b->bottom->nbr)
 	{
+		i++;
 		op_ra(b);
-		//ft_printf("%s%s", CYAN, "rb\n");
 	}
+	if (a->top != NULL)
+		clean_bot_r_heuristic(a, median, i);
 }
 
-void    cleanup_placement(t_control *b, int clean)
+void    cleanup_placement(t_control *a, t_control *b, int clean, int median)
 {
 	if (b->bottom != NULL)
 	{
 		if (clean == 1)
-			clean_top(b);
+			clean_top(a, b, median);
 		else
-			clean_bot(b);
+			clean_bot(a, b, median);
 	}
 }
 
 void    placement(t_control *a, t_control *b)
 {
 	op_pa(b, a);
-	//ft_printf("%s%s", MAGENTA, "pb\n");
+	ft_printf("%s%s", MAGENTA, "pb\n");
 }
 
 int		setup_placement(t_control *a, t_control *b)
@@ -234,9 +363,7 @@ void    large_sort(t_control *a, t_control *b, int num)
 	{
 		clean = setup_placement(a, b);
 		placement(a, b);
-		cleanup_placement(b, clean);
-		//For cleanup placement, think about top/bottom and settling those.
-		//Split into 3 separate functions so the heuristic can be added easier
+		cleanup_placement(a, b, clean, num / 2);
 	}
 	fuck_it_all(a, b);
 	//Now, how should the heuristic work? You know about utilizing
