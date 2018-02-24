@@ -104,6 +104,15 @@ void    set_pos(t_control *a, int num)
 	free(arr);
 }
 
+/*
+** Damn, how the fuck did you come up with this.
+** Basically, it checks for how many digits it's larger than
+** in stack B. If it has more elements its larger than the
+** the size of the median/equal to, it goes up and size_b - i
+** shows you how many digits are in the way. Otherwise,
+** it shows the num * neg to say you go down for it.
+*/
+
 int     up_or_down_decide(int i, int size_b)
 {
 	double size_b_round;
@@ -144,28 +153,6 @@ int		up_or_down(t_control *a, t_control *b)
 		}
 	}
 	return (up_or_down_decide(i, size_b)); 
-}
-
-void	decide_bottom(int numbot, t_control *b)
-{
-	while (numbot > 0)
-	{
-		op_rra(b);
-		ft_printf("%s%s", LIME, "rrb\n");
-		numbot--;
-	}
-}
-
-void	decide_top(int numtop, t_control *b)
-{
-	if (numtop == 1)
-		numtop--;
-	while (numtop > 0)
-	{
-		op_ra(b);
-		ft_printf("%s%s", CYAN, "rb\n");
-		numtop--;
-	}
 }
 
 int		clean_swap_heuristic(t_control *a, int median)
@@ -331,13 +318,53 @@ void    cleanup_placement(t_control *a, t_control *b, int clean, int median)
 	}
 }
 
+void	decide_bottom(int numbot, t_control *a, t_control *b, int perfect)
+{
+	int tmpperfect;
+
+	tmpperfect = perfect;
+	while (perfect > 0)
+	{
+		op_rrr(a, b);
+		ft_printf("%s%s", PURPLE, "rrr\n");
+		perfect--;
+	}
+	while (numbot - tmpperfect > 0)
+	{
+		op_rra(b);
+		ft_printf("%s%s", LIME, "rrb\n");
+		numbot--;
+	}
+}
+
+void	decide_top(int numtop, t_control *a, t_control *b, int perfect)
+{
+	int tmpperfect;
+
+	tmpperfect = perfect;
+	if (numtop == 1)
+		numtop--;
+	while (perfect > 0)
+	{
+		op_rr(a, b);
+		ft_printf("%s%s", DARKYELLOW, "rr\n");
+		perfect--;
+	}
+	while (numtop - tmpperfect > 0)
+	{
+		op_ra(b);
+		ft_printf("%s%s", CYAN, "rb\n");
+		numtop--;
+	}
+}
+
 void    placement(t_control *a, t_control *b)
 {
 	op_pa(b, a);
 	ft_printf("%s%s", MAGENTA, "pb\n");
 }
 
-int		setup_placement(t_control *a, t_control *b)
+int		setup_placement(t_control *a, t_control *b, int perfect)
 {
 	int decide;
 
@@ -345,29 +372,235 @@ int		setup_placement(t_control *a, t_control *b)
 	{
 		if (decide < 0)
 		{
-			decide_bottom(decide * -1, b);
+			decide_bottom(decide * -1, a, b, perfect);
 			return (-1);
 		}
-		decide_top(decide, b);
+		decide_top(decide, a, b, perfect);
 		return (1);
 	}
 	return (0);
 }
 
+int		sizeof_stack(t_control *a)
+{
+	t_stack *ptr;
+	int i;
+
+	i = 0;
+	ptr = a->top;
+	while (ptr != NULL)
+	{
+		i++;
+		ptr = ptr->down;
+	}
+	return (i);
+}
+
+/*
+** Negative signals you're grabbing lower pieces.
+*/
+
+int		calc_units_inbtwn(int iterations, int size_a)
+{
+	double size_a_round;
+	int size_a_up;
+
+	size_a_round = (double)size_a;
+	size_a_up = (int)(size_a_round / 2 + 0.5);
+	if (iterations <= size_a_up)
+		return (iterations);
+	else
+		return ((size_a - iterations) * -1);
+}
+
+/*
+** Going down = RRA. Two negatives = shared
+** Going up = RA.  Two positives = shared
+** Value is the median - pos, if it's negative then it's *-1 +1.
+** Iterations is how many iteration is in between. 
+** Simultaneous sees if the setup can cut into the movement.
+*/
+
+int	calc_heuristic(int value, int iterations, int simultaneous)
+{
+	int heuristic;
+
+	if (value < 0)
+		value = (value * -1);
+	if (iterations < 0 && simultaneous <= 0)
+		heuristic = value + (iterations * -1 + 1) - (simultaneous * -1);
+	else if (iterations >=0 && simultaneous >= 0)
+		heuristic = value + iterations - simultaneous;
+	else
+	{
+		if (iterations < 0)
+			iterations = (iterations * -1) + 1;
+		heuristic = value + iterations;
+	} 
+	return (heuristic);
+}
+
+void	make_movements(int moves, t_h *h, t_control *a)
+{
+	if (moves < 0)
+	{
+		moves *= -1;
+		moves++;
+		while (moves - h->perfect > 0)
+		{
+			op_rra(a);
+			ft_printf("%s%s", GREEN, "rra\n");
+			moves--;
+		}
+	}
+	else if (moves > 0)
+	{
+		while (moves - h->perfect > 0)
+		{
+			op_ra(a);
+			ft_printf("%s%s", LIGHTBLUE, "ra\n");
+			moves--;
+		}
+	}
+}
+
+void	set_perfect(t_h *h, int moves)
+{
+	if (moves < 0 && h->simult <= 0)
+	{
+		moves = (moves * -1 + 1);
+		h->simult *= -1;
+		if (moves >= h->simult)
+			h->perfect = h->simult;
+		else
+			h->perfect = moves; 
+	}
+	else if (moves >= 0 && h->simult >= 0)
+	{
+		if (moves >= h->simult)
+			h->perfect = h->simult;
+		else
+			h->perfect = moves;
+	}
+	else
+		h->perfect = 0;
+}
+
+int		up_or_down_mod(t_stack *a, t_control *b)
+{
+	int size_b;
+	t_stack *ptr;
+	int i;
+
+	i = 0;
+	size_b = 0;
+	ptr = b->top;
+	while (ptr != NULL)
+	{
+		size_b++;
+		ptr = ptr->down;
+	}
+	if (size_b != 0 && size_b != 1 && (a->nbr < b->top->nbr && a->nbr > b->bottom->nbr))
+	{
+		ptr = b->top;
+		while (ptr != NULL)
+		{
+			if (a->nbr > ptr->nbr)
+				i++;
+			ptr = ptr->down;
+		}
+	}
+	return (up_or_down_decide(i, size_b)); 
+}
+
+/*
+** See the difference with or without the >= on the heuristic. Meaning do you prioritize low iterations or high iterations?
+** Ughh, you idiot. You have to remake the thing for h->simultaneous...
+** FUUUUUUCKKKK AAAARRRGHHHh
+*/
+
+void	movement(t_control *a, t_control *b, t_h *h, int median)
+{
+	t_stack *ptr;
+	int size_a;
+	int moves;
+
+	size_a = sizeof_stack(a);
+	ptr = a->top;
+	h->simultaneous = up_or_down_mod(ptr, b);
+	if (ptr != NULL)
+		h->heuristic = calc_heuristic(median - ptr->pos, calc_units_inbtwn(h->counter, size_a), h->simultaneous);
+	while (ptr != NULL)
+	{
+		h->simultaneous = up_or_down_mod(ptr, b);
+		h->heuristictmp = calc_heuristic(median - ptr->pos, calc_units_inbtwn(h->counter, size_a), h->simultaneous);
+		if (h->heuristic >= h->heuristictmp)
+		{
+			h->pos = h->counter;
+			h->simult = h->simultaneous;
+		}
+		ptr = ptr->down;
+		h->counter++;
+	}
+	moves = calc_units_inbtwn(h->pos, size_a);
+	set_perfect(h, moves);
+	make_movements(moves, h, a);
+}
+
+void	set_h(t_h **h)
+{
+	*h = malloc(sizeof(t_h));
+	(*h)->heuristic = 0;
+	(*h)->heuristictmp = 0;
+	(*h)->counter = 0;
+	(*h)->pos = 0;
+	(*h)->simultaneous = 0;
+	(*h)->simult = 0;
+	(*h)->perfect = 0;
+}
+
+void	reset_h(t_h *h)
+{
+	h->heuristic = 0;
+	h->heuristictmp = 0;
+	h->counter = 0;
+	h->pos = 0;
+	h->simultaneous = 0;
+	h->simult = 0;
+	h->perfect = 0;
+}
+
+/*
+** Well, let's just cram a movement + heuristic into here without a care in the world.
+** Heuristic = you take the lowest value as the best.
+** (median - pos), (if (< 0) then *-1 and +1), then plus steps - (same setup steps)
+** Meaning you need to keep track if the *-1 +1 flag is triggered
+** So that you can subtract the same setup steps only in the case that neg. steps are required.
+** Then eventually, you can do something clever for the cleanup placement helping the next movement.
+** Perhaps NO setup heuristic would be ideal.
+** If you add setup, it'll never place things in the middle until the end if it misses it.
+** Ie. skips a middle and places something over it, and now it's (n * 2) + 1 or (n * 2 + 2) more steps.
+** Eh, (median - pos) + iterations - simultaneous movement, no setup included.
+*/
+
 void    large_sort(t_control *a, t_control *b, int num)
 {
 	int clean;
+	t_h *h;
+	int median;
 
+	median = num / 2;
+	set_h(&h);
 	set_pos(a, num);
 	while (a->top != NULL)
 	{
-		clean = setup_placement(a, b);
+		movement(a, b, h, median);
+		clean = setup_placement(a, b, h->perfect);
 		placement(a, b);
-		cleanup_placement(a, b, clean, num / 2);
+		cleanup_placement(a, b, clean, median);
+		reset_h(h);
 	}
 	fuck_it_all(a, b);
-	//Now, how should the heuristic work? You know about utilizing
-	// rr, rrr, and double swaps.... 
-	// You'll check and see if you can reach a more "middle" number
-	// each time you do this. 
+	check_stack(a);
+	// Free t_h heuristic;
 }

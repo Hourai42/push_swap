@@ -34,6 +34,17 @@ typedef struct s_control
     struct s_stack *bottom;
 }               t_control;
 
+typedef struct s_h
+{
+    int heuristic;
+    int heuristictmp;
+    int counter;
+    int pos;
+    int simultaneous;
+    int simult;
+    int perfect;
+}               t_h;
+
 /*
 ** Functions for push_swap
 */
