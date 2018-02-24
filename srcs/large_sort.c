@@ -413,6 +413,28 @@ int		calc_units_inbtwn(int iterations, int size_a)
 		return ((size_a - iterations) * -1);
 }
 
+void	set_perfect_mod(t_h *h, int moves)
+{
+	if (moves < 0 && h->simultaneous <= 0)
+	{
+		moves = (moves * -1 + 1);
+		h->simultaneous *= -1;
+		if (moves >= h->simultaneous)
+			h->perfect = h->simultaneous * -1;
+		else
+			h->perfect = moves * -1; 
+	}
+	else if (moves >= 0 && h->simultaneous >= 0)
+	{
+		if (moves >= h->simultaneous)
+			h->perfect = h->simultaneous;
+		else
+			h->perfect = moves;
+	}
+	else
+		h->perfect = 0;
+}
+
 /*
 ** Going down = RRA. Two negatives = shared
 ** Going up = RA.  Two positives = shared
@@ -421,16 +443,17 @@ int		calc_units_inbtwn(int iterations, int size_a)
 ** Simultaneous sees if the setup can cut into the movement.
 */
 
-int	calc_heuristic(int value, int iterations, int simultaneous)
+int	calc_heuristic(int value, int iterations, t_h *h)
 {
 	int heuristic;
 
+	set_perfect_mod(h, iterations);
 	if (value < 0)
 		value = (value * -1);
-	if (iterations < 0 && simultaneous <= 0)
-		heuristic = value + (iterations * -1 + 1) - (simultaneous * -1);
-	else if (iterations >=0 && simultaneous >= 0)
-		heuristic = value + iterations - simultaneous;
+	if (iterations < 0 && h->perfect <= 0)
+		heuristic = value + (iterations * -1 + 1) - (h->perfect * -1);
+	else if (iterations >=0 && h->perfect >= 0)
+		heuristic = value + iterations - h->perfect;
 	else
 	{
 		if (iterations < 0)
@@ -529,11 +552,11 @@ void	movement(t_control *a, t_control *b, t_h *h, int median)
 	ptr = a->top;
 	h->simultaneous = up_or_down_mod(ptr, b);
 	if (ptr != NULL)
-		h->heuristic = calc_heuristic(median - ptr->pos, calc_units_inbtwn(h->counter, size_a), h->simultaneous);
+		h->heuristic = calc_heuristic(median - ptr->pos, calc_units_inbtwn(h->counter, size_a), h);
 	while (ptr != NULL)
 	{
 		h->simultaneous = up_or_down_mod(ptr, b);
-		h->heuristictmp = calc_heuristic(median - ptr->pos, calc_units_inbtwn(h->counter, size_a), h->simultaneous);
+		h->heuristictmp = calc_heuristic(median - ptr->pos, calc_units_inbtwn(h->counter, size_a), h);
 		if (h->heuristic >= h->heuristictmp)
 		{
 			h->pos = h->counter;
