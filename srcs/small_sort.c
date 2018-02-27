@@ -32,7 +32,8 @@ void	fuck_it_all(t_control *a, t_control *b)
 	while (b->top != NULL)
 	{
 		op_pa(a, b);
-		ft_printf("%s%s", PINK, "pa\n");
+		//ft_printf("%s%s", PINK, "pa\n");
+		ft_putstr("pa\n");
 	}
 }
 
@@ -41,7 +42,8 @@ void	closer_to_top(t_control *a, int smallest)
 	while (a->top->nbr != smallest)
 	{
 		op_ra(a);
-		ft_printf("%s%s", LIME, "ra\n");
+		//ft_printf("%s%s", LIME, "ra\n");
+		ft_putstr("ra\n");
 	}
 }	
 
@@ -50,7 +52,8 @@ void	closer_to_bottom(t_control *a, int smallest)
 	while (a->top->nbr != smallest)
 	{
 		op_rra(a);
-		ft_printf("%s%s", MAGENTA, "rra\n");
+		//ft_printf("%s%s", MAGENTA, "rra\n");
+		ft_putstr("rra\n");
 	}
 }
 
@@ -80,7 +83,8 @@ void	find_and_push(t_control *a, t_control *b, int num)
 	else
 		closer_to_bottom(a, ptr->nbr);
 	op_pa(b, a);
-	ft_printf("%s%s", YELLOW, "pb\n");
+	//ft_printf("%s%s", YELLOW, "pb\n");
+	ft_putstr("pb\n");
 }
 
 void	small_sort(t_control *a, t_control *b, int num)
@@ -93,7 +97,8 @@ void	small_sort(t_control *a, t_control *b, int num)
 	if (a->top->nbr > a->bottom->nbr)
 	{
 		op_sa(a);
-		ft_printf("%s%s", PURPLE, "sa\n");
+		//ft_printf("%s%s", PURPLE, "sa\n");
+		ft_putstr("sa\n");
 	}
 	fuck_it_all(a, b);
 }

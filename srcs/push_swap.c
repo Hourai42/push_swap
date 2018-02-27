@@ -20,7 +20,7 @@ int	ted_sort(t_control *a, t_control *b)
 	if (check_sorted(a, b) == 1)
 		return (1);
 	numNbrs = num_of_nbrs(a);
-	if (numNbrs <= 1)
+	if (numNbrs <= 10)
 		small_sort(a, b, numNbrs);
 	else
 		large_sort(a, b, numNbrs);

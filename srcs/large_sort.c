@@ -11,107 +11,6 @@
 /* ************************************************************************** */
 
 #include "push_swap.h"
-/*
-** Kept simple for now. Heuristic will only be used for seeing if it's worth
-** it to do the double operations.
-** In the future, possibly consider more than one digit for the heuristic
-** and look at groups instead -- the operations that put most median to 
-** the top. But that probably isn't worth it as each time you place a piece
-** in, you have a ton of rotations to get a more fitting piece in. 
-** How about swaps to get more fitting pieces in at the beginning?
-** Hmm, the reverse and rotates should already do the trick for this...
-** Through swaps, you could get rid of putting in undesirables early?
-** Ie. since your double rotations will change the "front"
-** You can swap to get rid of end/beginning pieces early on.
-*/
-
-void    ft_swap(int *a, int *b)
-{
-	int tmp;
-
-	tmp = *a;
-	*a = *b;
-	*b = tmp;
-}
-
-int     partition(int *arr, int low, int high)
-{
-	int pivot;
-	int i;
-
-	i = (low - 1);
-	pivot = arr[high];
-	while (low <= (high - 1))
-	{
-		if (arr[low] <= pivot)
-			ft_swap(&arr[++i], &arr[low]);
-		low++;
-	}
-	ft_swap(&arr[i + 1], &arr[high]);
-	return (i + 1);
-}
-
-/*
-** Low is the starting index, high is the ending index.
-** Give this one a bit of practice and understanding, it seems useful.
-*/
-
-void    quicksort(int *arr, int low, int high)
-{
-	int partit;
-
-	if (low < high)
-	{
-		partit = partition(arr, low, high);
-		quicksort(arr, low, partit - 1);
-		quicksort(arr, partit + 1, high);
-	}
-}
-
-void    handle_pos(int *arr, t_control *a)
-{
-	t_stack *ptr;
-	int i;
-
-	i = 0;
-	ptr = a->top;
-	while (ptr != NULL)
-	{
-		while (ptr->nbr != arr[i])
-			i++;
-		ptr->pos = i + 1;
-		i = 0;
-		ptr = ptr->down;
-	}
-}
-
-void    set_pos(t_control *a, int num)
-{
-	int *arr;
-	t_stack *ptr;
-	int i;
-
-	i = 0;
-	ptr = a->top;
-	arr = malloc(sizeof(int) * num);
-	while (ptr != NULL)
-	{
-		arr[i++] = ptr->nbr;
-		ptr = ptr->down;
-	}
-	quicksort(arr, 0, num - 1);
-	handle_pos(arr, a);
-	free(arr);
-}
-
-/*
-** Damn, how the fuck did you come up with this.
-** Basically, it checks for how many digits it's larger than
-** in stack B. If it has more elements its larger than the
-** the size of the median/equal to, it goes up and size_b - i
-** shows you how many digits are in the way. Otherwise,
-** it shows the num * neg to say you go down for it.
-*/
 
 int     up_or_down_decide(int i, int size_b)
 {
@@ -322,8 +221,11 @@ void	decide_bottom(int numbot, t_control *a, t_control *b, int perfect)
 {
 	int tmpperfect;
 
-	tmpperfect = perfect;
-	while (perfect > 0)
+	if (perfect == 0)
+		tmpperfect = 0;
+	else
+		tmpperfect = perfect - 1;
+	while (perfect - 1 > 0)
 	{
 		op_rrr(a, b);
 		ft_printf("%s%s", PURPLE, "rrr\n");
@@ -343,12 +245,22 @@ void	decide_top(int numtop, t_control *a, t_control *b, int perfect)
 
 	tmpperfect = perfect;
 	if (numtop == 1)
-		numtop--;
-	while (perfect > 0)
 	{
-		op_rr(a, b);
-		ft_printf("%s%s", DARKYELLOW, "rr\n");
-		perfect--;
+		numtop--;
+		if (perfect > 0)
+		{
+			op_ra(a);
+			ft_putstr("ra\n");
+		}
+	}
+	else
+	{
+		while (perfect > 0)
+		{
+			op_rr(a, b);
+			ft_printf("%s%s", DARKYELLOW, "rr\n");
+			perfect--;
+		}
 	}
 	while (numtop - tmpperfect > 0)
 	{
@@ -417,7 +329,7 @@ void	set_perfect_mod(t_h *h, int moves)
 {
 	if (moves < 0 && h->simultaneous <= 0)
 	{
-		moves = (moves * -1 + 1);
+		moves = (moves * -1);
 		h->simultaneous *= -1;
 		if (moves >= h->simultaneous)
 			h->perfect = h->simultaneous * -1;
@@ -557,10 +469,10 @@ void	movement(t_control *a, t_control *b, t_h *h, int median)
 	{
 		h->simultaneous = up_or_down_mod(ptr, b);
 		h->heuristictmp = calc_heuristic(median - ptr->pos, calc_units_inbtwn(h->counter, size_a), h);
-		if (h->heuristic >= h->heuristictmp)
+		if (h->heuristic > h->heuristictmp)
 		{
 			h->pos = h->counter;
-			h->simult = h->simultaneous;
+			h->heuristic = h->heuristictmp;
 		}
 		ptr = ptr->down;
 		h->counter++;
@@ -604,6 +516,7 @@ void	reset_h(t_h *h)
 ** If you add setup, it'll never place things in the middle until the end if it misses it.
 ** Ie. skips a middle and places something over it, and now it's (n * 2) + 1 or (n * 2 + 2) more steps.
 ** Eh, (median - pos) + iterations - simultaneous movement, no setup included.
+** Hmm, but your shit doesnt' assume a sorted stack B. Why isn't... FUCK.
 */
 
 void    large_sort(t_control *a, t_control *b, int num)
@@ -624,6 +537,5 @@ void    large_sort(t_control *a, t_control *b, int num)
 		reset_h(h);
 	}
 	fuck_it_all(a, b);
-	check_stack(a);
 	// Free t_h heuristic;
 }

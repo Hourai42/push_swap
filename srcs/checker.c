@@ -106,6 +106,10 @@ void	add_instruction(t_queue **instruct, int instruction)
 	}
 }
 
+/*
+** Change it to read 1 byte at a time.
+*/
+
 int	read_instructions(t_queue *instruct)
 {
 	char buffer[3];
@@ -116,13 +120,15 @@ int	read_instructions(t_queue *instruct)
 	{
 		ft_bzero(buffer, 3);
 		extra[0] = 0;
-		read(1, buffer, 3);
-		if (buffer[0] == '\n')
+		read(STDIN_FILENO, &buffer[0], 1);
+		if (buffer[0] == '\n' || buffer[0] == 0)
 			break;
-		if (buffer[1] == '\n')
+		read(STDIN_FILENO, &buffer[1], 1);
+		if (buffer[1] == '\n' || buffer[1] == 0)
 			return (1);
-		if (buffer[2] != '\n')
-			read(1, extra, 1);
+		read(STDIN_FILENO, &buffer[2], 1);
+		if (buffer[2] != '\n' && buffer[2] != 0)
+			read(STDIN_FILENO, extra, 1);
 		if ((instruct_nbr = check_instruction(buffer, extra)) == 11)
 			return (1);
 		add_instruction(&instruct, instruct_nbr);

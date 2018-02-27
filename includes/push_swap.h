@@ -74,4 +74,11 @@ void	small_sort(t_control *a, t_control *b, int num);
 int	num_of_nbrs(t_control *a);
 void	fuck_it_all(t_control *a, t_control *b);
 
+void    updated_sort(t_control *a, t_control *b, int num);
+/*
+** Quicksort to handle positioning
+*/
+
+void    set_pos(t_control *a, int num);
+
 #endif
