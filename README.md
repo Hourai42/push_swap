@@ -1,11 +1,20 @@
 # push_swap
-I'm guessing this is the project where you learn about every single sorting algorithm, time complexity, then eventually create your own terrible algorithm to pass the assignment. 
 
-Fuck push_swap. Moving on for now! 
+A program that takes in a list of numbers onto a stack, then has to sort said stack using another stack. Essentially, you have 2 stacks to sort a list of numbers. 
 
-Checker is done, small sort is done, one day you'll handle the medium/large sort.
-Learn how to make your code more modular so you can consistently reuse functions. 
+A limited number of operations are given
+- swap 2 elements on stack a
+- swap 2 elements on stack b
+- both the above at the same time
 
------------------------------------------------------------------------------------------
+- push element on top of stack a to top of stack b
+- push element on top of stack b to top of stack a
+- both the above at the same time
 
-I hope the main lesson imparted upon you after failing this project is that modular readable code is extremely important. The fact that you included no documentation made it nigh-impossible to understand your own code. The lack of testing and writing matters out on paper made it so that you made tons of mistakes that were easily fixable. The lack of modularity meant that you had to re-create functions with extraordinarily minor changes, and it made the whole process overwhelmingly confusing. You need to find a way to make trustworthy functions that can be constantly reused... and it's of vital importance to plan the creation of your programs beforehand. 
+- rotate stack a, first element becomes last
+- rotate stack b, first element becomes last
+- both the above at same time
+
+- reverse rotate stack a, last element becomes the first
+- reverse rotate stack b, last element becomes the first
+- both the above at the same time
